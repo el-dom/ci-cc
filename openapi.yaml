@@ -1,0 +1,368 @@
+openapi: '3.0.3'
+info:
+  title: CI CC
+  description: 'CI CC'
+  version: 1.0.0
+servers:
+- url: /
+paths:
+  /todos:
+    get:
+      tags:
+      - todo
+      operationId: getTodos
+      summary: Get all Todos
+      responses:
+        '200':
+          description: |-
+            Success response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
+                          example: 10
+                    - $ref: '#/components/schemas/Todo'
+        '404':
+          description: |-
+            No Todos yet
+    post:
+      tags:
+      - todo
+      summary: Add a new Todo
+      description: Add a new Todo
+      operationId: addTodo
+      requestBody:
+        $ref: '#/components/requestBodies/Todo'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          headers:
+            Location:
+              description: Location of the newly created Todo
+              schema:
+                type: string
+                example: /todos/1999
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 10
+                  - $ref: '#/components/schemas/Todo'
+        '400':
+          description: Invalid data
+  /todos/{todoId}:
+    get:
+      tags:
+      - todo
+      summary: Get todo by ID
+      description: Returns a single Todo
+      operationId: getTodoById
+      parameters:
+      - name: todoId
+        in: path
+        description: ID of Todo to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 10
+                  - $ref: '#/components/schemas/Todo'
+        '404':
+          description: Todo not found
+    put:
+      tags:
+      - todo
+      summary: Updates a todo
+      operationId: updateTodo
+      parameters:
+      - name: todoId
+        in: path
+        description: ID of the Todo
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      example: 10
+                - $ref: '#/components/schemas/Todo'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 10
+                  - $ref: '#/components/schemas/Todo'
+        '400':
+          description: Invalid request
+        '404':
+          description: Todo not found
+    delete:
+      tags:
+      - todo
+      summary: Deletes a Todo
+      operationId: deleteTodo
+      parameters:
+      - name: todoId
+        in: path
+        description: Todo ID to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          description: Todo not found
+  /todos/{todoId}/tasks:
+    get:
+      tags:
+      - tasks
+      operationId: getTasks
+      parameters:
+        - name: todoId
+          in: path
+          description: ID of the Todo
+          required: true
+          schema:
+            type: integer
+            format: int64
+      summary: Get all Tasks of a Todo
+      responses:
+        '200':
+          description: |-
+            200 response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
+                          example: 10
+                    - $ref: '#/components/schemas/Todo'
+        '404':
+          description: |-
+            No tasks for this todo
+    post:
+      tags:
+      - tasks
+      summary: Create a task for a todo
+      description: Create a new task
+      operationId: createTask
+      parameters:
+        - name: todoId
+          in: path
+          description: ID of the Todo
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+      responses:
+        '201':
+          description: successful operation
+          headers:
+            Location:
+              description: Location of the newly created Task
+              schema:
+                type: string
+                example: /todos/1999
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 10
+                  - $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid request
+        '404':
+          description: Todo for task not found
+  /tasks/{taskId}:
+    get:
+      tags:
+      - tasks
+      summary: Get task by ID
+      operationId: getTaskById
+      parameters:
+      - name: taskId
+        in: path
+        description: ID of the Task
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 10
+                  - $ref: '#/components/schemas/Task'
+        '404':
+          description: Task or todo not found
+    put:
+      tags:
+        - tasks
+      summary: Updates a task
+      operationId: updateTask
+      parameters:
+        - name: taskId
+          in: path
+          description: ID of the Task
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                      format: int64
+                      example: 10
+                - $ref: '#/components/schemas/Task'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 10
+                  - $ref: '#/components/schemas/Task'
+        '400':
+          description: Invalid request
+        '404':
+          description: Task not found
+    delete:
+      tags:
+      - tasks
+      summary: Delete a task by ID
+      operationId: deleteTask
+      parameters:
+      - name: taskId
+        in: path
+        description: ID of the Task to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '204':
+          description: Successfully deleted
+        '404':
+          description: Task or Todo not found
+components:
+  schemas:
+    Todo:
+      required:
+      - name
+      - description
+      type: object
+      properties:
+        name:
+          type: string
+          example: Grocery shopping
+        description:
+          type: string
+          example: Every Wednesday afternoon
+        tasks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    Task:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          example: Buy three bottles of milk
+  requestBodies:
+    Todo:
+      description: Todo
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Todo'
+    Task:
+      description: Task
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Task'
